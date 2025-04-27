@@ -29,7 +29,7 @@ public class Song {
     private Timestamp releasedDate;
 
 
-    @JoinColumn(name = "admin_id")
     @ManyToOne
+    @JoinColumn(name = "admin_id")
     private Admin admin;
 }

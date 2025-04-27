@@ -16,88 +16,88 @@ import java.sql.Timestamp;
 @RestController
 public class UserController {
 
-    @Autowired
-    CommonUtils commonUtils;
+    private final CommonUtils commonUtils;
+    private final IUserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
-    IUserRepository userRepository;
-
-    @Autowired
-    UserService userService;
+    public UserController(CommonUtils commonUtils, IUserRepository userRepository, UserService userService) {
+        this.commonUtils = commonUtils;
+        this.userRepository = userRepository;
+        this.userService = userService;
+    }
 
 
     @GetMapping("getuser")
-    public ResponseEntity getuser (@Nullable @RequestParam Integer userId){
-        JSONObject jsonObject=userService.getuser(userId);
-        return new ResponseEntity<>(jsonObject.toString(),HttpStatus.OK);
+    public ResponseEntity getuser(@Nullable @RequestParam Integer userId) {
+        JSONObject jsonObject = userService.getuser(userId);
+        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
 
     @PostMapping("loginuser")
-    public ResponseEntity loginuser(@RequestBody  String loginrequest){
-        JSONObject jsonObject=new JSONObject(loginrequest);
-        JSONObject erroeObject=validateuserName(jsonObject);
-        String error="";
-        if(erroeObject.isEmpty()){
+    public ResponseEntity loginuser(@RequestBody String loginrequest) {
+        JSONObject jsonObject = new JSONObject(loginrequest);
+        JSONObject erroeObject = validateuserName(jsonObject);
+        String error = "";
+        if (erroeObject.isEmpty()) {
             User user = setlogin(jsonObject);
-          error=  userService.savelogin(user);
-        }
-        else{
-            return new ResponseEntity<>(erroeObject.toString(),HttpStatus.BAD_REQUEST);
+            error = userService.savelogin(user);
+        } else {
+            return new ResponseEntity<>(erroeObject.toString(), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(error,HttpStatus.OK);
+        return new ResponseEntity<>(error, HttpStatus.OK);
 
     }
 
     private User setlogin(JSONObject jsonObject) {
-        User user=new User();
+        User user = new User();
         user.setUserName(jsonObject.getString("userName"));
         user.setPassword(jsonObject.getString("password"));
         return user;
     }
 
     private JSONObject validateuserName(JSONObject jsonObject) {
-        JSONObject errorList=new JSONObject();
-        if(!jsonObject.has("userName")){
-            errorList.put("errorMessage","this filed in mandatory");
+        JSONObject errorList = new JSONObject();
+        if (!jsonObject.has("userName")) {
+            errorList.put("errorMessage", "this filed in mandatory");
         }
-        if(!jsonObject.has("password")){
-            errorList.put("errorMessage","This field is mandatory");
+        if (!jsonObject.has("password")) {
+            errorList.put("errorMessage", "This field is mandatory");
         }
 
         return errorList;
     }
 
     @PostMapping("saveUser")
-    public ResponseEntity saveuser(@RequestBody User requestUser){
-        JSONObject jsonObject=new JSONObject(requestUser);
-        JSONObject errorObject=validateuser(jsonObject);
-        if(errorObject.isEmpty()){
-            User user=setuser(jsonObject);
+    public ResponseEntity saveuser(@RequestBody User requestUser) {
+        JSONObject jsonObject = new JSONObject(requestUser);
+        JSONObject errorObject = validateuser(jsonObject);
+        if (errorObject.isEmpty()) {
+            User user = setuser(jsonObject);
             userService.saveuser(user);
-        }
-        else{
+        } else {
             return new ResponseEntity<>(errorObject.toString(), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("user registered",HttpStatus.CREATED);
+        return new ResponseEntity<>("user registered", HttpStatus.CREATED);
     }
 
     private User setuser(JSONObject jsonObject) {
-        User newuser=new User();
+        User newuser = new User();
         newuser.setUserName(jsonObject.getString("userName"));
         newuser.setEmail(jsonObject.getString("email"));
         newuser.setPassword(jsonObject.getString("password"));
         newuser.setPhoneNumber(jsonObject.getString("phoneNumber"));
 
-        if(jsonObject.has("fullName")){
+        if (jsonObject.has("fullName")) {
             newuser.setFullName(jsonObject.getString("fullName"));
         }
 
-        if(jsonObject.has("gender")){
+        if (jsonObject.has("gender")) {
             newuser.setGender(jsonObject.getString("gender"));
         }
 
-        Timestamp createdDate=new Timestamp(System.currentTimeMillis());
+        Timestamp createdDate = new Timestamp(System.currentTimeMillis());
         newuser.setCreatedDate(createdDate);
 
         return newuser;
@@ -105,44 +105,40 @@ public class UserController {
 
     private JSONObject validateuser(JSONObject jsonObject) {
 
-        JSONObject errorList=new JSONObject();
+        JSONObject errorList = new JSONObject();
 
-        if(jsonObject.has("userName")){
-            if(userRepository.findByUserName(jsonObject.getString("userName"))!=null){
-                errorList.put("userName","Already Exists");
+        if (jsonObject.has("userName")) {
+            if (userRepository.findByUserName(jsonObject.getString("userName")) != null) {
+                errorList.put("userName", "Already Exists");
             }
-        }
-        else{
-            errorList.put("errorMessage","This field is mandatory");
+        } else {
+            errorList.put("errorMessage", "This field is mandatory");
         }
 
 
-        if(jsonObject.has("password")){
-            if(!commonUtils.isValidPassword(jsonObject.getString("password"))){
-                errorList.put("password","is invalid must be in this format : Tanvir@112");
+        if (jsonObject.has("password")) {
+            if (!commonUtils.isValidPassword(jsonObject.getString("password"))) {
+                errorList.put("password", "is invalid must be in this format : Tanvir@112");
             }
-        }
-        else{
-            errorList.put("errorMessage","This field is mandatory");
+        } else {
+            errorList.put("errorMessage", "This field is mandatory");
         }
 
 
-        if(jsonObject.has("email")){
-            if(!commonUtils.isValidEmail(jsonObject.getString("email"))){
-                errorList.put("email","invalid email must be in this format:tanvir@gmail.com");
+        if (jsonObject.has("email")) {
+            if (!commonUtils.isValidEmail(jsonObject.getString("email"))) {
+                errorList.put("email", "invalid email must be in this format:tanvir@gmail.com");
             }
-        }
-        else{
-            errorList.put("errorMessage","This field is mandatory");
+        } else {
+            errorList.put("errorMessage", "This field is mandatory");
         }
 
-        if(jsonObject.has("phoneNumber")){
-            if(!commonUtils.isPhoneNumberValid(jsonObject.getString("phoneNumber"))){
-                errorList.put("phoneNumber","invalid phoneNumber");
+        if (jsonObject.has("phoneNumber")) {
+            if (!commonUtils.isPhoneNumberValid(jsonObject.getString("phoneNumber"))) {
+                errorList.put("phoneNumber", "invalid phoneNumber");
             }
-        }
-        else{
-            errorList.put("errorMessage","This field is mandatory");
+        } else {
+            errorList.put("errorMessage", "This field is mandatory");
         }
 
         return errorList;

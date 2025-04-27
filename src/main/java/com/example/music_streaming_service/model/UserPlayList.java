@@ -28,7 +28,13 @@ public class UserPlayList {
     private Timestamp updatedDate;
 
 
-    @OneToMany(fetch = FetchType.LAZY)
+    // Many-to-many relationship with Song through UserPlaylistSong
+    @ManyToMany
+    @JoinTable(
+            name = "user_playlist_tbl_song_list",
+            joinColumns = @JoinColumn(name = "user_playlist_list_id"),
+            inverseJoinColumns = @JoinColumn(name = "song_list_song_id")
+    )
     private List<Song> songList;
 
 

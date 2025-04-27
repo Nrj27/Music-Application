@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Data
@@ -43,6 +44,10 @@ public class Admin {
     private Timestamp updatedDate;
 
     private String gender;
+
+    // One-to-many relationship with Song
+    @OneToMany(mappedBy = "admin", fetch = FetchType.LAZY)
+    private List<Song> songs;
 
 
 }

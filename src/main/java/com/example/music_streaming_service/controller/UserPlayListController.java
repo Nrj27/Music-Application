@@ -9,7 +9,6 @@ import com.example.music_streaming_service.model.User;
 import com.example.music_streaming_service.model.UserPlayList;
 import com.example.music_streaming_service.service.UserPlayListService;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -22,18 +21,22 @@ import java.util.List;
 @RestController
 public class UserPlayListController {
 
-   @Autowired
-    IUserRepository userRepository;
+    private final IUserRepository userRepository;
+    private final IUserPlayListRepository userPlayListRepository;
+    private final UserPlayListService userPlayListService;
+    private final ISongRepository songRepository;
 
-   @Autowired
-    IUserPlayListRepository userPlayListRepository;
-   @Autowired
-    UserPlayListService userPlayListService;
+    public UserPlayListController(IUserRepository userRepository,
+                                  IUserPlayListRepository userPlayListRepository,
+                                  UserPlayListService userPlayListService,
+                                  ISongRepository songRepository) {
+        this.userRepository = userRepository;
+        this.userPlayListRepository = userPlayListRepository;
+        this.userPlayListService = userPlayListService;
+        this.songRepository = songRepository;
+    }
 
-   @Autowired
-    ISongRepository songRepository;
-
-   @GetMapping("getplaylist")
+    @GetMapping("getplaylist")
    public ResponseEntity getplaylist(@Nullable @RequestParam Integer listId, @RequestParam Integer userId){
        JSONObject json=new JSONObject();
        if(!userRepository.findByUserId(userId).isEmpty()){
