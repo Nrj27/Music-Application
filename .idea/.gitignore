@@ -1,3 +1,22 @@
-# Default ignored files
+# IntelliJ IDEA project files
+.idea/
+*.iml
 /shelf/
 /workspace.xml
+/compiler.xml
+/encodings.xml
+/jarRepositories.xml
+/misc.xml
+/sonarlint.xml
+/vcs.xml
+
+# Maven output
+target/
+
+# Eclipse project files
+.classpath
+.project
+
+# OS-specific
+.DS_Store
+Thumbs.db
